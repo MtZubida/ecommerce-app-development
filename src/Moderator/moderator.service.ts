@@ -7,6 +7,7 @@ import { SecureModeratorDTO } from "./DTOs/secureModerator.dto";
 import { EditModeratorDTO } from "./DTOs/editModerator.dto";
 import { AdminEntity } from "src/Admin/admin.entity";
 import { UserEntity } from "src/User/user.entity";
+import { SellerEntity } from "src/Seller/seller.entity";
 
 @Injectable()
 export class ModeratorService{
@@ -20,6 +21,9 @@ export class ModeratorService{
 
         @InjectRepository(UserEntity)
         private userRepo: Repository<UserEntity>,
+
+        @InjectRepository(SellerEntity)
+        private sellerRepo: Repository<SellerEntity>,
     ){}
 
     getIndex(): any{
@@ -100,8 +104,9 @@ export class ModeratorService{
         const existingAdmin = await this.adminRepo.findOneBy({ Username: mydto.Username });
         const existingModerator = await this.moderatorRepo.findOneBy({ Username: mydto.Username });
         const existingUser = await this.userRepo.findOneBy({ Username: mydto.Username });
+        const existSeller = await this.sellerRepo.findOneBy({ Username: mydto.Username });
 
-        if (existingModerator || existingAdmin || existingUser) {
+        if (existingModerator || existingAdmin || existingUser||existSeller) {
             return "Username already exists, please choose a different username";
         } else {
             const salt = await bcrypt.genSalt();

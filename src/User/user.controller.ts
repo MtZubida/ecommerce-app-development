@@ -48,6 +48,7 @@ export class UserController{
     }
 
     @Delete('delete/:id')
+    @UseGuards(SessionGuard)
     deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
         return this.userService.deleteModeratorById(id);
     }
@@ -63,7 +64,6 @@ export class UserController{
     unblockModerator(@Param('id', ParseIntPipe) id: number): any{
         return this.userService.unblockModeratorById(id);
     }
-
 
     @Post('/register')
     @UseInterceptors(FileInterceptor('myfile',

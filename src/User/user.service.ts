@@ -7,6 +7,7 @@ import {UserEntity } from "./user.entity";
 import * as bcrypt from 'bcrypt';
 import { SecureAdminDTO } from "src/Admin/DTOs/secureAdmin.dto";
 import { EditUserDTO } from "./DTOs/editUser.dto";
+import { SellerEntity } from "src/Seller/seller.entity";
 
 @Injectable()
 export class UserService{
@@ -20,6 +21,9 @@ export class UserService{
 
         @InjectRepository(AdminEntity)
         private adminRepo: Repository<AdminEntity>,
+
+        @InjectRepository(SellerEntity)
+        private sellerRepo: Repository<SellerEntity>,
     ){}
 
     getIndex(): any{
@@ -103,8 +107,9 @@ export class UserService{
         const existingAdmin = await this.adminRepo.findOneBy({ Username: mydto.Username });
         const existingModerator = await this.moderatorRepo.findOneBy({ Username: mydto.Username });
         const existingUser = await this.userRepo.findOneBy({ Username: mydto.Username });
+        const existSeller = await this.sellerRepo.findOneBy({ Username: mydto.Username });
 
-        if (existingModerator || existingAdmin || existingUser) {
+        if (existingModerator || existingAdmin || existingUser||existSeller) {
             return "Username already exists, please choose a different username";
         } else {
             const salt = await bcrypt.genSalt();
