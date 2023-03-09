@@ -2,14 +2,14 @@ import { IsAlpha, IsBoolean, IsDate, IsDateString, IsEmail, IsMobilePhone, IsNot
 
 export class EditModeratorDTO{
 
-    @IsAlpha()
+
     @IsString({message: "Please enter your First name"})
     @MaxLength(15,{message:"Maximum length of the first name can't exceed 15 characters"})
     @MinLength(5, {message:"Minimum length of the first name can't exceed 3 characters"})
     @IsNotEmpty({message:"First name can't be empty"})
     Firstname:string;
 
-    @IsAlpha()
+
     @IsString({message: "Please enter your Last name"})
     @MaxLength(15,{message:"Maximum length of the first name can't exceed 15 characters"})
     @MinLength(3, {message:"Minimum length of the first name can't exceed 3 characters"})
