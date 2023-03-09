@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { ModeratorEntity } from "src/Moderator/moderator.entity";
 import { SecureAdminDTO } from "./DTOs/secureAdmin.dto";
 import { EditAdminDTO } from "./DTOs/editAdmin.dto";
+import { UserEntity } from "src/User/user.entity";
 
 @Injectable()
 export class AdminService {
@@ -15,7 +16,10 @@ export class AdminService {
         private adminRepo: Repository<AdminEntity>,
 
         @InjectRepository(ModeratorEntity)
-        private moderatorRepo: Repository<ModeratorEntity>
+        private moderatorRepo: Repository<ModeratorEntity>,
+
+        @InjectRepository(UserEntity)
+        private userRepo: Repository<UserEntity>,
     ){}
 
     
@@ -99,7 +103,8 @@ export class AdminService {
     async signup(mydto) {
         const existingAdmin = await this.adminRepo.findOneBy({ Username: mydto.Username });
         const existingModerator = await this.moderatorRepo.findOneBy({ Username: mydto.Username });
-        if (existingAdmin || existingModerator) {
+        const checkUser = await this.userRepo.findOneBy({ Username: mydto.Username });
+        if (existingAdmin || existingModerator || checkUser) {
             return "Username already exists, please choose a different username";
         } else {
             const salt = await bcrypt.genSalt();
@@ -111,13 +116,17 @@ export class AdminService {
 
     async login(username, password){
         const mydata= await this.adminRepo.findOneBy({Username: username});
-        const isMatch= await bcrypt.compare(password, mydata.Password);
-        if(isMatch && mydata.Blocked != true) {
-            return 1;
+        if(mydata){
+            const isMatch= await bcrypt.compare(password, mydata.Password);
+            if(isMatch && mydata.Blocked != true) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
         }
-        else {
+        else
             return 0;
-        }
     
     }
 

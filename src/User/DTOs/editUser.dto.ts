@@ -1,6 +1,6 @@
 import { IsAlpha, IsBoolean, IsDate, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString, Matches, MaxDate, MaxLength, MinLength } from "class-validator";
 
-export class EditModeratorDTO{
+export class EditUserDTO{
 
     @IsAlpha()
     @IsString({message: "Please enter your First name"})
@@ -33,5 +33,8 @@ export class EditModeratorDTO{
 
     @IsNotEmpty()
     filename: string
+
+    @IsNotEmpty()
+    Wallet: Number
 
 }
