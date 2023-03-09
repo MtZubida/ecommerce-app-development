@@ -1,85 +1,70 @@
-import { Body, Controller, DefaultValuePipe, Delete, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseBoolPipe, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Query, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
-import { ModeratorService } from "./moderator.service";
-import { ModeratorDTO } from "./DTOs/moderator.dto";
-import { EditModeratorDTO } from "./DTOs/editModerator.dto";
-import { ProcessedReportService } from "src/ProcessedReport/processedReport.services";
+import { Body, Controller, Delete, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Session, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { distinct } from "rxjs";
 import { diskStorage } from "multer";
+import { EditModeratorDTO } from "./DTOs/editModerator.dto";
+import { ModeratorDTO } from "./DTOs/moderator.dto";
+import { ModeratorService } from "./moderator.service";
+import { SessionGuard } from "./session.guard";
 
-@Controller("/moderator")
-export class ModeratorController {
+@Controller('/moderator')
+export class ModeratorController{
+    constructor(private moderatorService: ModeratorService){}
 
-    constructor(private moderatorService: ModeratorService,
-        private processedReportService: ProcessedReportService
-        ){}
+    @Get('/index')
+    Index(): any {
+        return this.moderatorService.getIndex();
+    }
 
-    // @Get('/index')
-    // Index(): any {
-    //     return this.moderatorService.getIndex();
-    // }
+    @Get('/getSecure')
+    @UseGuards(SessionGuard)
+    getModeratorSecure(): any {
+        return this.moderatorService.getAllSecureData();
+    }
 
-    // @Get('/getSecure')
-    // getModeratorSecure(): any {
-    //     return this.moderatorService.getAllSecureData();
-    // }
+    @Get('/getAll')
+    @UseGuards(SessionGuard)
+    getModerators(): any {
+        return this.moderatorService.getAll();
+    }
 
-    // @Get('/getAll')
-    // getModerators(): any {
-    //     return this.moderatorService.getAll();
-    // }
+    @Get("/search/:id")
+    @UseGuards(SessionGuard)
+    searchById(@Param('id', ParseIntPipe) id:number){
+        return this.moderatorService.searchById(id);
+    }
 
-    // @Get("/search/:id")
-    // searchById(@Param('id', ParseIntPipe) id:number){
-    //     return this.moderatorService.searchById(id);
-    // }
+    @Get("search/s/:username")
+    @UseGuards(SessionGuard)
+    searchByUsername(@Param('username',) username:string){
+        return this.moderatorService.searchByUsername(username);
+    }
 
-    // @Get("/register/readAgreement")
-    // readTurmsAndConditions(@Query ('read', ParseBoolPipe)read?:boolean){
-    //     return this.moderatorService.readTurmsAndConditions(read);
-    // }
+    @Post("/editProfile/:id")
+    @UseGuards(SessionGuard)
+    @UsePipes(new ValidationPipe())
+    editProfile( @Body() editModeratorDTO: EditModeratorDTO, @Param('id', ParseIntPipe) id: number): any{
+        return this.moderatorService.editModerator(editModeratorDTO, id); 
+    }
 
-    // @Get("search/s/:username")
-    // searchByUsername(@Param('username',) username:string){
-    //     return this.moderatorService.searchByUsername(username);
-    // }
+    @Delete('delete/:id')
+    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
+        return this.moderatorService.deleteModeratorById(id);
+    }
 
-    // @Put("/login")
-    // addModerator(
-    //     @Body("username") username:string,
-    //     @Body("password") password:string
-    // ){
-    //     return this.moderatorService.login(username, password);
-    // }
+    @Patch('block/:id')
+    @UseGuards(SessionGuard)
+    blockModerator(@Param('id', ParseIntPipe) id: number): any{
+        return this.moderatorService.blockModeratorById(id);
+    }
 
-    // @Post("/register")
-    // @UsePipes(new ValidationPipe())
-    // register(@Body() moderatorDTO: ModeratorDTO): any{
-    //     return this.moderatorService.register(moderatorDTO);
-    // }
+    @Patch('unblock/:id')
+    @UseGuards(SessionGuard)
+    unblockModerator(@Param('id', ParseIntPipe) id: number): any{
+        return this.moderatorService.unblockModeratorById(id);
+    }
 
-    // @Post("/editProfile/:id")
-    // @UsePipes(new ValidationPipe())
-    // editProfile( @Body() editModeratorDTO: EditModeratorDTO, @Param('id', ParseIntPipe) id: number): any{
-    //     return this.moderatorService.editModerator(editModeratorDTO, id); 
-    // }
 
-    // @Delete('delete/:id')
-    // deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
-    //     return this.moderatorService.deleteModeratorById(id);
-    // }
-
-    // @Patch('block/:id')
-    // blockModerator(@Param('id', ParseIntPipe) id: number): any{
-    //     return this.moderatorService.blockModeratorById(id);
-    // }
-
-    // @Get("/getReportByModeratorId/:id")
-    // getReportByModeratorId(@Param('id', ParseIntPipe) id: number):any{
-    //     return this.moderatorService.getReportByModerator(id);
-    // }
-
-    @Post('/signup')
+    @Post('/register')
     @UseInterceptors(FileInterceptor('myfile',
     {storage:diskStorage({
       destination: './uploads',
@@ -91,35 +76,42 @@ export class ModeratorController {
     }))
     signup(@Body() mydto:ModeratorDTO,@UploadedFile(new ParseFilePipe({
       validators: [
-        new MaxFileSizeValidator({ maxSize: 16000 }),
         new FileTypeValidator({ fileType: 'png|jpg|jpeg|' }),
       ],
     }),) file: Express.Multer.File){
     
-    mydto.filename = file.filename;  
-    
-    return this.moderatorService.signup(mydto);
-    console.log(file)
+        mydto.filename = file.filename;  
+        mydto.Blocked = false;
+        return this.moderatorService.signup(mydto);
     }
+
+    @Put("/login")
+    async addModerator( @Session() session,
+        @Body("username") username:string,
+        @Body("password") password:string
+    ){
+        if(await this.moderatorService.login(username, password) == 1){
+            session.username = username;
+            return {message:"Successfully logged"};
+        }
+        else{
+            return {message:"Invalid username or password"};
+        }
+    }
+
+    @Get('/logout')
+    signout(@Session() session)
+    {
+        if(session.destroy())
+        {
+            return {message:"you are logged out"};
+        }
+        else
+        {
+            throw new UnauthorizedException("invalid actions");
+        }
+    }
+
+
     
-
-
-
-
-
-    
-
-
-
-    
-
-
-
-
-
-
-
 }
-
-    
-

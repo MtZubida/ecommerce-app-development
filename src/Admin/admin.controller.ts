@@ -1,85 +1,117 @@
-import { Controller, Get, Param, ParseIntPipe, Query ,Post ,Body ,Put,Delete, UsePipes, ValidationPipe} from '@nestjs/common';
-import { AdminService } from './adminservice.service';
-import { Adminlogin, Categoryinfo, Productinfo, sellerinfo } from "./adminlogin.dto";
-//import { Categoryinfo } from "./categoryinfo.dto";
+import { Body, Controller, Delete, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Session, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { AdminService } from "./admin.service";
+import { AdminDTO } from "./DTOs/admin.dto";
+import { EditAdminDTO } from "./DTOs/editAdmin.dto";
+import { SessionGuard } from "./session.guard";
 
-@Controller()
+@Controller("/admin")
 export class AdminController{
-      constructor(private readonly adminService: AdminService) {}
-    @Get("/:id") 
-    getinfo(@Param("id", ParseIntPipe) id:number):any{
-        return "id is"+id;
-    }
-    @Post("/adminlog")
-    @UsePipes(new ValidationPipe())
-    loginAdmin(@Body() mydto:Adminlogin): any {
-      return this.adminService.loginAdmin(mydto);
+
+    constructor(private adminService: AdminService){}
+    
+    @Get('/index')
+    Index(): any {
+        return this.adminService.getIndex();
     }
 
-    @Get("/findadmin")
-    getcategory(@Query() qry :any):any{
-    return "Admin name is"+ qry.name;
+    @Get('/getSecure')
+    @UseGuards(SessionGuard)
+    getModeratorSecure(): any {
+        return this.adminService.getAllSecureData();
+    }
+
+    @Get('/getAll')
+    @UseGuards(SessionGuard)
+    getModerators(): any {
+        return this.adminService.getAll();
+    }
+
+    @Get("/search/:id")
+    @UseGuards(SessionGuard)
+    searchById(@Param('id', ParseIntPipe) id:number){
+        return this.adminService.searchById(id);
+    }
+
+    @Get("search/s/:username")
+    @UseGuards(SessionGuard)
+    searchByUsername(@Param('username',) username:string){
+        return this.adminService.searchByUsername(username);
+    }
+
+    @Post("/editProfile/:id")
+    @UseGuards(SessionGuard)
+    @UsePipes(new ValidationPipe())
+    editProfile( @Body() editModeratorDTO: EditAdminDTO, @Param('id', ParseIntPipe) id: number): any{
+        return this.adminService.editModerator(editModeratorDTO, id); 
+    }
+
+    @Delete('delete/:id')
+    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
+        return this.adminService.deleteModeratorById(id);
+    }
+
+    @Patch('block/:id')
+    @UseGuards(SessionGuard)
+    blockModerator(@Param('id', ParseIntPipe) id: number): any{
+        return this.adminService.blockModeratorById(id);
+    }
+
+    @Patch('unblock/:id')
+    @UseGuards(SessionGuard)
+    unblockModerator(@Param('id', ParseIntPipe) id: number): any{
+        return this.adminService.unblockModeratorById(id);
+    }
+
+
+    @Post('/register')
+    @UseInterceptors(FileInterceptor('myfile',
+    {storage:diskStorage({
+      destination: './uploads',
+      filename: function (req, file, cb) {
+        cb(null,Date.now()+file.originalname)
+      }
+    })
+
+    }))
+    signup(@Body() mydto:AdminDTO,@UploadedFile(new ParseFilePipe({
+      validators: [
+        new FileTypeValidator({ fileType: 'png|jpg|jpeg|' }),
+      ],
+    }),) file: Express.Multer.File){
+    
+        mydto.filename = file.filename;  
+        mydto.Blocked = false;
+        return this.adminService.signup(mydto);
+    }
+
+    @Put("/login")
+    async addModerator( @Session() session,
+        @Body("username") username:string,
+        @Body("password") password:string
+    ){
+        if(await this.adminService.login(username, password) == 1){
+            session.username = username;
+            return {message:"Successfully logged"};
+        }
+        else{
+            return {message:"Invalid username or password"};
+        }
+    }
+
+
+    @Get('/logout')
+    signout(@Session() session)
+    {
+        if(session.destroy())
+        {
+            return {message:"you are logged out"};
+        }
+        else
+        {
+            throw new UnauthorizedException("invalid actions");
+        }
     }
     
-    // @Post("/cinfo")
-    // @UsePipes(new ValidationPipe())
-    // insertcategory(@Body() mydto1:Categoryinfo): any {
-    //   return this.adminService.insertcategory(mydto1);
-    // }
-
-    @Put("/updatecategory/")
-    updatecategory( 
-      @Body("id") id:number, 
-      @Body("cname") cname:string,
-      @Body("status") status:string
-      ): any {
-    return this.adminService.updatecategory(id, cname,status);
-    }
-
-    @Delete("/deletecategory/:id")
-    deletecategorybyid( 
-       @Param("id") id:number
-        ): any {
-      return this.adminService.deletecategorybyid(id);
-      }
-      @Get("/viewproduct")
-      getproduct(@Query() qry :any):any{
-      return "Admin name is"+ qry.id;
-      }
-      @Post("/pinfo")
-      @UsePipes(new ValidationPipe())
-      insertproduct(@Body() mydto1:Productinfo): any {
-        return this.adminService.insertproduct(mydto1);
-      }
-      @Put("/updateproduct/")
-    updateproduct( 
-      @Body("id") id:number, 
-      @Body("pname") pname:string,
-      @Body("mrp") mrp:number,
-      @Body("price") price:number,
-      @Body("status") status:string
-      ): any {
-    return this.adminService.updateproduct(id, pname,mrp,price,status);
-    }
-    @Delete("/deleteproduct/:id")
-    deleteproductbyid( 
-       @Param("id") id:number
-        ): any {
-      return this.adminService.deleteproductbyid(id);
-      }
-      @Post("/sellerinfo")
-      insertseller(@Body() mydto1:sellerinfo): any {
-        return this.adminService.insertseller(mydto1);
-      } 
-      
-      @Put("/updateseller/")
-      updateseller( 
-        @Body("id") id:number, 
-        @Body("sname") sname:string,
-        @Body("email") email:number,
-        @Body("phn") phn:number,
-        @Body("address") address:string
-        ): any {
-      return this.adminService.updateproduct(id, sname,email,phn,address);
-      }
 }

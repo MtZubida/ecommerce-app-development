@@ -1,6 +1,6 @@
 import { IsAlpha, IsBoolean, IsDate, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString, Matches, MaxDate, MaxLength, MinLength } from "class-validator";
 
-export class EditModeratorDTO{
+export class EditAdminDTO{
 
     @IsAlpha()
     @IsString({message: "Please enter your First name"})

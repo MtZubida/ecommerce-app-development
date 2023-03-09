@@ -1,30 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import * as bcrypt from 'bcrypt';
 import { Repository } from "typeorm";
-import { ModeratorEntity } from "./moderator.entity";
-import { SecureModeratorDTO } from "./DTOs/secureModerator.dto";
-import { EditModeratorDTO } from "./DTOs/editModerator.dto";
-import { AdminEntity } from "src/Admin/admin.entity";
+import { AdminEntity } from "./admin.entity";
+import * as bcrypt from 'bcrypt';
+import { ModeratorEntity } from "src/Moderator/moderator.entity";
+import { SecureAdminDTO } from "./DTOs/secureAdmin.dto";
+import { EditAdminDTO } from "./DTOs/editAdmin.dto";
 
 @Injectable()
-export class ModeratorService{
+export class AdminService {
 
     constructor(
-        @InjectRepository(ModeratorEntity)
-        private moderatorRepo: Repository<ModeratorEntity>, 
-
         @InjectRepository(AdminEntity)
         private adminRepo: Repository<AdminEntity>,
+
+        @InjectRepository(ModeratorEntity)
+        private moderatorRepo: Repository<ModeratorEntity>
     ){}
 
+    
+
     getIndex(): any{
-        return "This path will be the Moderator panel";
+        return "This path will be the Admin panel";
     }
 
-    async getAllSecureData(): Promise<SecureModeratorDTO[]> {
-        const moderators: ModeratorEntity[] = await this.moderatorRepo.find();
-        const secureModerators: SecureModeratorDTO[] = moderators.map(
+    async getAllSecureData(): Promise<SecureAdminDTO[]> {
+        const moderators: ModeratorEntity[] = await this.adminRepo.find();
+        const secureModerators: SecureAdminDTO[] = moderators.map(
             ({ Username, Firstname, Lastname, DOB, Phone, Email, filename }) => ({
               Username,
               Firstname,
@@ -39,11 +41,11 @@ export class ModeratorService{
     }
 
     getAll(): any{
-        return this.moderatorRepo.find();
+        return this.adminRepo.find();
     }
 
     searchById(id):any{
-        var ext = this.moderatorRepo.findOneBy({ Id:id });
+        var ext = this.adminRepo.findOneBy({ Id:id });
         if(ext){
             return ext;
         }
@@ -52,7 +54,7 @@ export class ModeratorService{
     }
 
     searchByUsername(username): any{
-        const ext = this.moderatorRepo.findOne({where: { Username:username}});
+        const ext = this.adminRepo.findOne({where: { Username:username}});
         if(ext){
             return ext;
         }
@@ -61,20 +63,20 @@ export class ModeratorService{
 
     }
 
-    editModerator(editModerator: EditModeratorDTO, id): any{
-        return this.moderatorRepo.update(id, editModerator);
+    editModerator(editAdmin: EditAdminDTO, id): any{
+        return this.adminRepo.update(id, editAdmin);
     }
 
     deleteModeratorById(id): any{
-        return this.moderatorRepo.delete(id);
+        return this.adminRepo.delete(id);
     }
 
     async blockModeratorById(id): Promise<any>{
 
-        var ext = this.moderatorRepo.findOneBy({ Id:id });
+        var ext = this.adminRepo.findOneBy({ Id:id });
         if(ext){
             (await ext).Blocked = true;
-            return this.moderatorRepo.update(id, await ext);
+            return this.adminRepo.update(id, await ext);
         }
         else
             return "No matches found for this ID in database!"; 
@@ -82,31 +84,33 @@ export class ModeratorService{
 
     async unblockModeratorById(id): Promise<any>{
 
-        var ext = this.moderatorRepo.findOneBy({ Id:id });
+        var ext = this.adminRepo.findOneBy({ Id:id });
         if(ext){
             (await ext).Blocked = false;
-            return this.moderatorRepo.update(id, await ext);
+            return this.adminRepo.update(id, await ext);
         }
         else
             return "No matches found for this ID in database!"; 
     }
 
-    async signup(mydto) {
 
+
+
+    async signup(mydto) {
         const existingAdmin = await this.adminRepo.findOneBy({ Username: mydto.Username });
         const existingModerator = await this.moderatorRepo.findOneBy({ Username: mydto.Username });
-        if (existingModerator || existingAdmin) {
+        if (existingAdmin || existingModerator) {
             return "Username already exists, please choose a different username";
         } else {
             const salt = await bcrypt.genSalt();
             const hassedpassed = await bcrypt.hash(mydto.Password, salt);
             mydto.Password= hassedpassed;
-            return this.moderatorRepo.save(mydto);
+            return this.adminRepo.save(mydto);
         }
     }
 
     async login(username, password){
-        const mydata= await this.moderatorRepo.findOneBy({Username: username});
+        const mydata= await this.adminRepo.findOneBy({Username: username});
         const isMatch= await bcrypt.compare(password, mydata.Password);
         if(isMatch && mydata.Blocked != true) {
             return 1;
@@ -116,6 +120,10 @@ export class ModeratorService{
         }
     
     }
+
+    
+
+    
 
 
 }

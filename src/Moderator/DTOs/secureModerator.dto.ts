@@ -9,5 +9,4 @@ export class SecureModeratorDTO{
     Phone:string;
     Username:string;
     filename: string
-
 }

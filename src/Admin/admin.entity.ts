@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity("moderator")
-export class ModeratorEntity{
+@Entity("admin")
+export class AdminEntity{
 
     @PrimaryGeneratedColumn()
     Id:number;
