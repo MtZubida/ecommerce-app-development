@@ -1,8 +1,9 @@
 import { ModeratorEntity } from "src/Moderator/moderator.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity("report")
-export class ReportEntity{
+@Entity("ProcessedReport")
+export class ProcessedReportEntity{
+    
     @PrimaryGeneratedColumn()
     Id:number;
 
@@ -21,12 +22,15 @@ export class ReportEntity{
     @Column()
     ReportedUserId: number;
 
+    // @Column()
+    // ReportedByUserId: number;
+
+    // @Column()
+    // ReportedByUsername:string;
+
     @Column()
     ProcessedByUsername:string;
 
     @Column()
     ProcessedByUserID: number;
-
-    // @ManyToOne(() => ModeratorEntity, (moderator) => moderator.report)
-    // moderator: ModeratorEntity;
 }

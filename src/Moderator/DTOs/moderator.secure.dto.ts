@@ -8,5 +8,6 @@ export class SecureModeratorDTO{
     Email:string;
     Phone:string;
     Username:string;
+    filename: string
 
 }

@@ -5,19 +5,19 @@ import { AdminModule } from './admin/adminmodule.module';
 import { SellerModule } from './Seller/seller.module';
 import { ModeratorModule } from './Moderator/moderator.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReportModule } from './Report/report.module';
+import { ProcessedReportModule } from './ProcessedReport/processedReport.module';
 
 
 @Module({
   //import individual module here. Do not override this 
   //Don't delete this
-  imports: [AdminModule, SellerModule, ModeratorModule, TypeOrmModule.forRoot({
+  imports: [ModeratorModule, TypeOrmModule.forRoot({
     type:'postgres',
     host: 'localhost',
     port:5432,
     username:'postgres',
     password:'112233',
-    database:'test',
+    database:'dbv1.2',
     autoLoadEntities: true,
     synchronize: true,
   })],

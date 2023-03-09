@@ -1,8 +1,9 @@
-import { ReportEntity } from "src/Report/report.entity";
+import { ProcessedReportEntity } from "src/ProcessedReport/processedReport.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("moderator")
 export class ModeratorEntity{
+
     @PrimaryGeneratedColumn()
     Id:number;
 
@@ -30,7 +31,7 @@ export class ModeratorEntity{
     @Column()
     Blocked:boolean;
 
-    // @OneToMany(() => ReportEntity, (report) => report.moderator)
-    // report:ReportEntity[]
+    @Column()
+    filename:string;
     
 }

@@ -1,6 +1,6 @@
 import { IsAlpha, IsBoolean, IsDate, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxDate, MaxLength, MinLength } from "class-validator";
 
-export class ReportDTO{
+export class ProcessedReportDTO{
     
     @IsString({message: "Please enter your Last name"})
     @MaxLength(15,{message:"Maximum length of the Report tittle can't exceed 25 characters"})
@@ -12,11 +12,18 @@ export class ReportDTO{
     @IsNotEmpty({message:"Discription can't be empty"})
     Discription:string;
 
-
     //Formet YYYY-MM-DD
     @IsNotEmpty({message:"Reported Date can't be empty"})
     @IsDateString()
     ReportedDate:Date;
+
+    // @IsString({message: "Please enter a Username"})
+    // @IsNotEmpty({message:"Username can't be empty"})
+    // ReportedByUsername:string;
+
+    // @IsNumber()
+    // @IsNotEmpty({message:"UserId can't be empty"})
+    // ReportedByUserId: number;
 
     @IsString({message: "Please enter a Username"})
     @IsNotEmpty({message:"Username can't be empty"})
@@ -27,11 +34,10 @@ export class ReportDTO{
     ReportedUserId: number;
 
     @IsString({message: "Please enter a Username"})
-    @IsNotEmpty({message:"Moderator username can't be empty"})
     ProcessedByUsername:string;
 
     @IsNumber()
-    @IsNotEmpty({message:"Moderator username can't be empty"})
     ProcessedByUserID: number;
     
+
 }

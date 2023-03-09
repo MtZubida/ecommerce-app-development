@@ -35,4 +35,7 @@ export class EditModeratorDTO{
     @IsBoolean({message:"Enter a boolean value: true or false"})
     Blocked:boolean;
 
+    @IsNotEmpty()
+    filename: string
+
 }

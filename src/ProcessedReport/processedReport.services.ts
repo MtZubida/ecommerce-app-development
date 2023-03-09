@@ -1,21 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ModeratorEntity } from "src/Moderator/moderator.entity";
 import { Repository } from "typeorm";
-import { ReportDTO } from "./report.dto";
-import { ReportEntity } from "./report.entity";
+import { ProcessedReportDTO } from "./processedReport.dto";
+import { ProcessedReportEntity } from "./processedReport.entity";
 
 @Injectable()
-export class ReportService {
+export class ProcessedReportService {
     
     constructor(
-        @InjectRepository(ReportEntity)
-        private reportRepo: Repository<ReportEntity>,
-        private moderatorRepo: Repository<ModeratorEntity>
+        @InjectRepository(ProcessedReportEntity)
+        private reportRepo: Repository<ProcessedReportEntity>
     ){}
 
-    addReport(reportDTO: ReportDTO):any{
-        const reportObject = new ReportEntity()
+    addReport(reportDTO: ProcessedReportDTO):any{
+        const reportObject = new ProcessedReportEntity()
         reportObject.ReportTittle = reportDTO.ReportTittle;
         reportObject.Discription = reportDTO.Discription;
         reportObject.ReportedDate = new Date();

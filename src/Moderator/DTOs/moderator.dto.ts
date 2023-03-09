@@ -47,4 +47,7 @@ export class ModeratorDTO{
     @IsBoolean({message:"Enter a boolean value: true or false"})
     Blocked:boolean;
 
+    @IsNotEmpty()
+    filename: string
+
 }
