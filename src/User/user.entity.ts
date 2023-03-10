@@ -40,5 +40,8 @@ export class UserEntity{
 
     @OneToMany(() => ReportEntity, (report) => report.user)
     reports: ReportEntity[];
+
+    @OneToMany(() => ReportEntity, (review) => review.user)
+    review: ReportEntity[];
     
 }

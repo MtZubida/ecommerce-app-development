@@ -40,4 +40,7 @@ export class SellerEntity{
     
     @OneToMany(() => ReportEntity, (report) => report.seller)
     reports: ReportEntity[];
+
+    @OneToMany(() => ReportEntity, (review) => review.seller)
+    review: ReportEntity[];
 }

@@ -10,7 +10,6 @@ import { ReportEntity } from "./report.entity";
 @Injectable()
 export class ReportService{
     constructor(
-
         @InjectRepository(UserEntity)
         private userRepo: Repository<UserEntity>,
 
@@ -95,19 +94,17 @@ export class ReportService{
 
 
     async searchBySellerUsername(username): Promise<ReportEntity[]> {
-        console.log(username);
         var ext = this.sellerRepo.findOne({where: { Username:username}});
         return this.searchBySellerId((await ext).Id);
     }
 
     async searchBySellerUsernameReturnAll(username): Promise<ReportEntity[]> {
-        console.log(username);
         var ext = this.sellerRepo.findOne({where: { Username:username}});
         return this.searchBySellerIdReturnAll((await ext).Id);
     }
 
 
-    //seller/reporter
+    //seller/reporter/ by id
 
     async searchByUserId(userId): Promise<ReportEntity[]> {
         const user = await this.userRepo.findOneBy({Id:userId})
@@ -133,6 +130,17 @@ export class ReportService{
         return reports;
     }
 
+    //seller/reporter/ by username
+
+    async searchByUserUsername(username): Promise<ReportEntity[]> {
+        var ext = this.userRepo.findOne({where: { Username:username}});
+        return this.searchByUserId((await ext).Id);
+    }
+    
+    async searchByUserUsernameReturnAll(username): Promise<ReportEntity[]> {
+        var ext = this.userRepo.findOne({where: { Username:username}});
+        return this.searchByUserIdReturnAll((await ext).Id);
+    }
 
     //Moderator Works
 

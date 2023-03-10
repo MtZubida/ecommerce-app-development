@@ -35,7 +35,7 @@ export class ReportController{
     }
 
 
-    //this will return users who have reported this seller bu Id
+    //this will return users who have reported this seller by Id
     @Get("/search/bySellerId/:id")
     @UseGuards(SessionGuard)
     searchBySellerId(@Param('id', ParseIntPipe) id:number){
@@ -76,6 +76,21 @@ export class ReportController{
     @UseGuards(SessionGuard)
     searchByUserIdReturnAll(@Param('id', ParseIntPipe) id:number){
         return this.reportsService.searchByUserIdReturnAll(id);
+    }
+
+    //Now
+    //Everything get by reported/user by username
+
+    @Get("/search/byUserUsername/:username")
+    @UseGuards(SessionGuard)
+    searchByUserUsername(@Param('username',) username:string){
+        return this.reportsService.searchByUserUsername(username);
+    }
+
+    @Get("/search/byUserUsername/returnAll/:username")
+    @UseGuards(SessionGuard)
+    searchByUserUsernameReturnAll(@Param('username',) username:string){
+        return this.reportsService.searchByUserUsernameReturnAll(username);
     }
 
     //Here moderator will hander next procedures
