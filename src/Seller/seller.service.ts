@@ -35,7 +35,7 @@ export class SellerService{
     }
 
     searchById(id):any{
-        var ext = this.sellerRepo.findOneBy({ Id:id });
+        const ext = this.sellerRepo.findOneBy({ Id:id });
         if(ext){
             return ext;
         }
@@ -44,7 +44,7 @@ export class SellerService{
     }
 
     searchByUsername(username): any{
-        const ext = this.sellerRepo.findOne({where: { Username:username}});
+        var ext = this.sellerRepo.findOne({where: { Username:username}});
         if(ext){
             return ext;
         }

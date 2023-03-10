@@ -1,4 +1,5 @@
 import { MessageEntity } from "src/Message/message.entity";
+import { ReportEntity } from "src/Report/report.entity";
 import { Column, Double, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("user")
@@ -37,10 +38,7 @@ export class UserEntity{
     @Column({ type: 'numeric', precision: 10, scale: 2 })
     Wallet: number;
 
-    @OneToMany(() => MessageEntity, message => message.sender)
-  sentMessages: MessageEntity[];
-
-  @OneToMany(() => MessageEntity, message => message.receiver)
-  receivedMessages: MessageEntity[];
+    @OneToMany(() => ReportEntity, (report) => report.user)
+    reports: ReportEntity[];
     
 }

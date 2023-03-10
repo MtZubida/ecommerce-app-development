@@ -1,4 +1,5 @@
 import { MessageEntity } from "src/Message/message.entity";
+import { ReportEntity } from "src/Report/report.entity";
 import { Column, Double, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("seller")
@@ -37,9 +38,6 @@ export class SellerEntity{
     @Column()
     TotalReviewer: number;
     
-    @OneToMany(() => MessageEntity, message => message.receiver)
-    receivedMessages: MessageEntity[];
-
-    @OneToMany(() => MessageEntity, message => message.sender)
-    sentMessages: MessageEntity[];
+    @OneToMany(() => ReportEntity, (report) => report.seller)
+    reports: ReportEntity[];
 }
