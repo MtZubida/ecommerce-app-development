@@ -1,3 +1,4 @@
+import { CouponEntity } from "src/Coupon/coupon.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("admin")
@@ -32,5 +33,8 @@ export class AdminEntity{
 
     @Column()
     filename:string;
+
+    @OneToMany(() => CouponEntity, (coupon) => coupon.admin)
+    coupon: CouponEntity[]
     
 }

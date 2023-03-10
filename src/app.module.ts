@@ -10,12 +10,13 @@ import { SellerModule } from './Seller/seller.module';
 import { ReportModule } from './Report/report.module';
 import { ReviewModule } from './Review/review.module';
 import { TransactionModule } from './Transaction/transaction.module';
+import { CouponModule } from './Coupon/coupon.module';
 
 
 @Module({
   //import individual module here. Do not override this 
   //Don't delete this
-  imports: [ModeratorModule, AdminModule, UserModule, MessageModule,SellerModule, ReportModule,ReviewModule, TransactionModule, TypeOrmModule.forRoot({
+  imports: [ModeratorModule, AdminModule, UserModule, MessageModule,SellerModule, ReportModule,ReviewModule, TransactionModule, CouponModule, TypeOrmModule.forRoot({
     type:'postgres',
     host: 'localhost',
     port:5432,

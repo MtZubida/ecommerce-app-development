@@ -45,9 +45,9 @@ export class ReviewService{
 
     async getAll(): Promise<ReviewEntity[]> {
         const queryBuilder = this.reviewRepo
-          .createQueryBuilder('report')
-          .leftJoinAndSelect('report.seller', 'seller')
-          .leftJoinAndSelect('report.user', 'user');
+          .createQueryBuilder('review')
+          .leftJoinAndSelect('review.seller', 'seller')
+          .leftJoinAndSelect('review.user', 'user');
         const reports = await queryBuilder.getMany();
         return reports;
     }
