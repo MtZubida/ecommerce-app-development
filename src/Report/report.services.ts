@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { ModeratorEntity } from "src/Moderator/moderator.entity";
 import { SellerEntity } from "src/Seller/seller.entity";
 import { UserEntity } from "src/User/user.entity";
-import { Repository } from "typeorm";
+import { IsNull, Not, Repository } from "typeorm";
 import { ReportDTO } from "./DTOs/report.dto";
 import { ReportEntity } from "./report.entity";
 
@@ -15,6 +16,9 @@ export class ReportService{
 
         @InjectRepository(SellerEntity)
         private sellerRepo: Repository<SellerEntity>,
+
+        @InjectRepository(ModeratorEntity)
+        private moderatorRepo: Repository<ModeratorEntity>,
 
         @InjectRepository(ReportEntity)
         private reportRepo: Repository<ReportEntity>,
@@ -128,6 +132,40 @@ export class ReportService{
         });
         return reports;
     }
+
+
+    //Moderator Works
+
+    async getUnprocessedReport(): Promise<ReportEntity[]> {
+        return await this.reportRepo.find({
+          where: { ModeratorUsername: null },
+        });
+    }
+
+    async process(id, Action, sess): Promise<any> {
+        const existingModerator = await this.moderatorRepo.findOneBy({ Username: sess});
+        if(existingModerator){
+            const ext = await this.reportRepo.findOneBy({ Id:id });
+            if(ext){
+                (await ext).Action = Action;
+                (await ext).ModeratorUsername = sess;
+                return this.reportRepo.update(id, ext);
+            }
+            else
+                return "Wront Report Id";
+            
+        }
+        else
+            return "Only moderator can process this! Login as moderator!";
+
+    }
+
+    async getProcessedReport(): Promise<ReportEntity[]> {
+        return await this.reportRepo.find({
+          where: { ModeratorUsername: Not(IsNull()) },
+        });
+    }
+
 
 
 

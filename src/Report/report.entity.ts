@@ -19,6 +19,9 @@ export class ReportEntity{
     @Column({ nullable: true })
     ModeratorUsername:string;
 
+    @Column({ nullable: true })
+    Action:string;
+
     @Column()
     Timestamp:Date = new Date();
 

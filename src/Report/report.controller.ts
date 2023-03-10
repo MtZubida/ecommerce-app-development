@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Session, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Session, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ReportDTO } from "./DTOs/report.dto";
 import { ReportService } from "./report.services";
 import { SessionGuard } from "./session.guard";
@@ -77,6 +77,35 @@ export class ReportController{
     searchByUserIdReturnAll(@Param('id', ParseIntPipe) id:number){
         return this.reportsService.searchByUserIdReturnAll(id);
     }
+
+    //Here moderator will hander next procedures
+    //Moderator Prodedures
+    
+    @Get('/getUnprocessedReport')
+    @UseGuards(SessionGuard)
+    getUnprocessedReport(): any {
+        return this.reportsService.getUnprocessedReport();
+    }
+
+    @Put("/processReportByModerator/:id")
+    @UseGuards(SessionGuard)
+    async addModerator( @Session() session,
+        @Body("Action") Action:string,
+        @Param('id', ParseIntPipe) id:number
+    ){
+
+        const sess = session.username;
+        return await this.reportsService.process(id,Action,sess);
+    }
+
+    @Get('/getProcessedReport')
+    @UseGuards(SessionGuard)
+    getProcessedReport(): any {
+        return this.reportsService.getProcessedReport();
+    }
+
+
+
 
 
 }
