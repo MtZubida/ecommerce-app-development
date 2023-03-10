@@ -1,5 +1,6 @@
 import { MessageEntity } from "src/Message/message.entity";
 import { ReportEntity } from "src/Report/report.entity";
+import { TransactionEntity } from "src/Transaction/transaction.entity";
 import { Column, Double, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("user")
@@ -43,5 +44,8 @@ export class UserEntity{
 
     @OneToMany(() => ReportEntity, (review) => review.user)
     review: ReportEntity[];
+
+    @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
+    transaction: TransactionEntity[];
     
 }
