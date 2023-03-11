@@ -12,12 +12,13 @@ import { ReviewModule } from './Review/review.module';
 import { TransactionModule } from './Transaction/transaction.module';
 import { CouponModule } from './Coupon/coupon.module';
 import { ProductModule } from './Product/product.module';
+import { CheckoutModule } from './Checkout/checkout.module';
 
 
 @Module({
   //import individual module here. Do not override this 
   //Don't delete this
-  imports: [ModeratorModule, AdminModule, UserModule, MessageModule,SellerModule, ReportModule,ReviewModule, TransactionModule, CouponModule, ProductModule, TypeOrmModule.forRoot({
+  imports: [ModeratorModule, AdminModule, UserModule, MessageModule,SellerModule, ReportModule,ReviewModule, TransactionModule, CouponModule, ProductModule,CheckoutModule, TypeOrmModule.forRoot({
     type:'postgres',
     host: 'localhost',
     port:5432,

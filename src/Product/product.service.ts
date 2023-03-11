@@ -1,6 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { CheckoutEntity } from "src/Checkout/checkout.entity";
 import { SellerEntity } from "src/Seller/seller.entity";
+import { TransactionEntity } from "src/Transaction/transaction.entity";
+import { UserEntity } from "src/User/user.entity";
 import { Repository } from "typeorm";
 import { ProductEntity } from "./product.entity";
 
@@ -12,6 +15,15 @@ export class ProductService {
 
         @InjectRepository(ProductEntity)
         private productRepo: Repository<ProductEntity>,
+
+        @InjectRepository(UserEntity)
+        private userRepo: Repository<UserEntity>,
+
+        @InjectRepository(TransactionEntity)
+        private transactionRepo: Repository<TransactionEntity>,
+
+        @InjectRepository(CheckoutEntity)
+        private checkoutRepo: Repository<CheckoutEntity>,
     ){}
 
     async add(mydto) {
@@ -46,7 +58,7 @@ export class ProductService {
     }
 
     async searchById(id):Promise<any>{
-        var ext = this.productRepo.findOneBy({ Id:id });
+        var ext = await this.productRepo.findOneBy({ Id:id });
         if(ext){
             return ext;
         }
@@ -64,4 +76,57 @@ export class ProductService {
 
     }
 
+    async buyProduct(id, buyerUsername):Promise<any>{
+        var product = await this.productRepo.findOne({where: { Id:id}});
+        if(product){
+            var buyer = await this.userRepo.findOne({where: { Username:buyerUsername}});
+            var seller = await this.sellerRepo.findOne({where: { Username:product.SellerUsername}});
+            if(buyer){
+                if(product.Quantity > 0){
+                    if(buyer.Wallet > product.Price){
+                        buyer.Wallet = (+buyer.Wallet - product.Price);
+                        seller.Wallet = (+seller.Wallet + product.Price);
+                        product.Quantity--;
+                        product.SelledQuantity++;
+
+                        const transEnty = new TransactionEntity();
+                        transEnty.user = buyer;
+                        transEnty.seller = seller;
+                        transEnty.Discription = "Bought a product";
+                        transEnty.SenderUsername = buyer.Username;
+                        transEnty.ReceiverUsername = seller.Username;
+                        transEnty.Ammount = product.Price;
+
+                        const cOut = new CheckoutEntity();
+                        cOut.ProductName = product.ProductName;
+                        cOut.Price = product.Price;
+                        cOut.Discription = "Bought a product";
+                        cOut.SellerUsername = seller.Username;
+                        cOut.BuyerUsername = buyer.Username;
+                        cOut.Quantity = 1;
+                        cOut.user = buyer;
+                        cOut.seller = seller;
+
+                        await this.checkoutRepo.save(cOut);
+                        await this.transactionRepo.save(transEnty);
+                        await this.userRepo.update(buyer.Id, buyer);
+                        await this.sellerRepo.update(seller.Id, seller);
+                        await this.productRepo.update(product.Id, product);
+                        return cOut;
+                    }
+                    else{
+                        return "You don't have enough money to buy this product";
+                    }
+                }
+                else{
+                    return "Quantity is 0. Not available. Try again later.";
+                }
+            }
+            else{
+                return "Login as User to buy products";
+            }
+        }
+        else
+            return "No matches found for this ID in database!"; 
+    }
 }

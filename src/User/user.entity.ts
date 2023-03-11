@@ -1,3 +1,4 @@
+import { CheckoutEntity } from "src/Checkout/checkout.entity";
 import { MessageEntity } from "src/Message/message.entity";
 import { ReportEntity } from "src/Report/report.entity";
 import { TransactionEntity } from "src/Transaction/transaction.entity";
@@ -47,5 +48,8 @@ export class UserEntity{
 
     @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
     transaction: TransactionEntity[];
+
+    @OneToMany(() => CheckoutEntity, (checkout) => checkout.user)
+    checkout: CheckoutEntity[];
     
 }

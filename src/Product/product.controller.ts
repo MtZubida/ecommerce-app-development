@@ -55,6 +55,13 @@ export class ProductController{
     searchByUsername(@Param('productname',) productname:string){
         return this.productService.searchByUsername(productname);
     }
+
+    @Get("/buy/:id")
+    @UseGuards(SessionGuard)
+    buyProduct(@Session() session, @Param('id', ParseIntPipe) id:number){
+        const buyerUsername = session.username;
+        return this.productService.buyProduct(id, buyerUsername);
+    }
     
     
 }
