@@ -10,7 +10,7 @@ export class TransactionEntity{
     @Column()
     SenderUsername:string;
 
-    @Column()
+    @Column({ nullable: true })
     ReceiverUsername:string;
 
     @Column()
@@ -22,10 +22,10 @@ export class TransactionEntity{
     @Column()
     Timestamp:Date = new Date();
 
-    @ManyToOne(() => UserEntity, (user) => user.transaction)
+    @ManyToOne(() => UserEntity, (user) => user.transaction,{ nullable: true })
     user: UserEntity;
 
-    @ManyToOne(() => SellerEntity, (seller) => seller.transaction)
+    @ManyToOne(() => SellerEntity, (seller) => seller.transaction, { nullable: true })
     seller: SellerEntity;
 
 }

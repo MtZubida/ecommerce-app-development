@@ -4,6 +4,7 @@ import { AdminEntity } from "src/Admin/admin.entity";
 import { Repository } from "typeorm";
 import { CouponEntity } from "./coupon.entity";
 import { CouponDTO } from "./DTOs/coupon.dto";
+import * as crypto from 'crypto';
 
 @Injectable()
 export class CouponService {
@@ -24,6 +25,7 @@ export class CouponService {
                 reportEnty.Ammount = mydto.Ammount.valueOf();
                 reportEnty.AdminUsername = mydto.AdminUsername;
                 reportEnty.Useability = mydto.Useability;
+                reportEnty.Couponcode = crypto.randomInt(100000000, 999999999);;
                 return this.couponRepo.save(reportEnty);
         }
         else{

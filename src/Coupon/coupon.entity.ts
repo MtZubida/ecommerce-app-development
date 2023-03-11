@@ -22,6 +22,9 @@ export class CouponEntity{
     Useability:number;
 
     @Column()
+    Couponcode: number;
+
+    @Column()
     Used: number = 0;
 
     @ManyToOne(() => AdminEntity, (admin) => admin.coupon)

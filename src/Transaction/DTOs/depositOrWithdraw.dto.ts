@@ -1,17 +1,17 @@
 import { IsAlpha, IsBoolean, IsDate, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString, Matches, MaxDate, MaxLength, MinLength } from "class-validator";
 
-export class TransactionDTO{
+export class DepositOrWithdrawlDTO{
 
     @IsOptional()
     SenderUsername:string;
 
-    @IsNotEmpty({message:"Enter receiver username"})
+    @IsOptional()
     ReceiverUsername:string;
 
     @IsNotEmpty({message:"Please provide Ammount"})
     Ammount:number;
 
-    @IsNotEmpty({message:"Please provide a Discription"})
+    @IsOptional()
     Discription:string;
 
     @IsOptional()
