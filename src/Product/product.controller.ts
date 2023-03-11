@@ -62,6 +62,14 @@ export class ProductController{
         const buyerUsername = session.username;
         return this.productService.buyProduct(id, buyerUsername);
     }
+
+    @Post("/buyUsingCoupon/:id")
+    @UseGuards(SessionGuard)
+    buyProductUsingCoupon(@Session() session, @Param('id', ParseIntPipe) id:number, 
+    @Body("coupon") coupon:number){
+        const buyerUsername = session.username;
+        return this.productService.buyProductUsingCoupon(id, buyerUsername, coupon);
+    }
     
     
 }
