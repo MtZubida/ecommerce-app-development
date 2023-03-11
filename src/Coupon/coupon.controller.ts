@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Session, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Session, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ReportDTO } from "src/Report/DTOs/report.dto";
 import { SessionGuard } from "./coupon.guard";
 import { CouponService } from "./coupon.service";
@@ -26,6 +26,12 @@ export class CouponController{
     @UseGuards(SessionGuard)
     getPartial(): any {
         return this.couponService.getPartial();
+    }
+
+    @Delete('delete/:id')
+    @UseGuards(SessionGuard)
+    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
+        return this.couponService.deleteCoupon(id);
     }
 
     

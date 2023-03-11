@@ -70,6 +70,10 @@ export class ProductService {
             return "No matches found for this ID in database!"; // Need to implement
     }
 
+    deleteProduct(id): any{
+        return this.productRepo.delete(id);
+    }
+
     searchByUsername(productname): any{
         const ext = this.productRepo.findOne({where: { ProductName:productname}});
         if(ext){

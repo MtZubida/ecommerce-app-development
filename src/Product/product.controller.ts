@@ -1,4 +1,4 @@
-import { Body, Controller, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Post, Session, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Post, Session, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { AdminDTO } from "src/Admin/DTOs/admin.dto";
@@ -54,6 +54,12 @@ export class ProductController{
     @UseGuards(SessionGuard)
     searchByUsername(@Param('productname',) productname:string){
         return this.productService.searchByUsername(productname);
+    }
+
+    @Delete('delete/:id')
+    @UseGuards(SessionGuard)
+    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
+        return this.productService.deleteProduct(id);
     }
 
     @Get("/buy/:id")

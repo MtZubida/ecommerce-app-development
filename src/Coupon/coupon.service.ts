@@ -45,4 +45,8 @@ export class CouponService {
         return this.couponRepo.find();
     }
 
+    deleteCoupon(id): any{
+        return this.couponRepo.delete(id);
+    }
+
 }
