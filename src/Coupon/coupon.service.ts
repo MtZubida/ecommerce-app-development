@@ -25,7 +25,7 @@ export class CouponService {
                 reportEnty.Ammount = mydto.Ammount.valueOf();
                 reportEnty.AdminUsername = mydto.AdminUsername;
                 reportEnty.Useability = mydto.Useability;
-                reportEnty.Couponcode = crypto.randomInt(100000000, 999999999);;
+                reportEnty.Couponcode = crypto.randomInt(100000000, 999999999);
                 return this.couponRepo.save(reportEnty);
         }
         else{

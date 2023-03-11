@@ -8,6 +8,8 @@ import { SecureAdminDTO } from "./DTOs/secureAdmin.dto";
 import { EditAdminDTO } from "./DTOs/editAdmin.dto";
 import { UserEntity } from "src/User/user.entity";
 import { SellerEntity } from "src/Seller/seller.entity";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ForgotPasswordEntity } from "src/ForgotPassword/forgot.entity";
 
 @Injectable()
 export class AdminService {
@@ -24,6 +26,11 @@ export class AdminService {
 
         @InjectRepository(SellerEntity)
         private sellerRepo: Repository<SellerEntity>,
+
+        @InjectRepository(ForgotPasswordEntity)
+        private forgotRepo: Repository<ForgotPasswordEntity>,
+
+        private mailerService: MailerService,
     ){}
 
     
@@ -136,8 +143,6 @@ export class AdminService {
             return 0;
     
     }
-
-    
 
     
 
