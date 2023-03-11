@@ -1,4 +1,5 @@
 import { MessageEntity } from "src/Message/message.entity";
+import { ProductEntity } from "src/Product/product.entity";
 import { ReportEntity } from "src/Report/report.entity";
 import { TransactionEntity } from "src/Transaction/transaction.entity";
 import { Column, Double, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -47,4 +48,7 @@ export class SellerEntity{
 
     @OneToMany(() => TransactionEntity, (transaction) => transaction.seller)
     transaction: TransactionEntity[];
+
+    @OneToMany(() => ProductEntity, (product) => product.seller)
+    product: ProductEntity[]
 }
