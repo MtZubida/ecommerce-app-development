@@ -17,4 +17,16 @@ export class MessageService{
         else
             return "You cant send message to yourself";
     }
+
+    async getMessages(
+        senderUsername: string,
+        receiverUsername: string,
+      ): Promise<MessageEntity[]> {
+        return this.messageRepo.find({
+          where: [
+            { SenderUsername: senderUsername, ReceverUsername: receiverUsername },
+            { SenderUsername: receiverUsername, ReceverUsername: senderUsername },
+          ],
+        });
+      }
 }

@@ -12,7 +12,7 @@ export class MessageEntity{
     ReceverUsername:string;
 
     @Column()
-    Timestamp:Date;
+    Timestamp:Date = new Date();
 
     @Column()
     Message:string;

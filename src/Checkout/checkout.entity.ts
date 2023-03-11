@@ -12,7 +12,7 @@ export class CheckoutEntity{
     ProductName:string;
 
     @Column()
-    Timestamp:Date = new Date();;
+    Timestamp:Date = new Date();
 
     @Column()
     Price:number;
