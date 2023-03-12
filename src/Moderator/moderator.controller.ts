@@ -5,6 +5,7 @@ import { EditModeratorDTO } from "./DTOs/editModerator.dto";
 import { ModeratorDTO } from "./DTOs/moderator.dto";
 import { ModeratorService } from "./moderator.service";
 import { SessionGuard } from "./session.guard";
+import { AdminSessionGuard } from "../Admin/admin.guard"
 
 @Controller('/moderator')
 export class ModeratorController{
@@ -16,25 +17,25 @@ export class ModeratorController{
     }
 
     @Get('/getSecure')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     getModeratorSecure(): any {
         return this.moderatorService.getAllSecureData();
     }
 
     @Get('/getAll')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     getModerators(): any {
         return this.moderatorService.getAll();
     }
 
     @Get("/search/:id")
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     searchById(@Param('id', ParseIntPipe) id:number){
         return this.moderatorService.searchById(id);
     }
 
     @Get("search/s/:username")
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     searchByUsername(@Param('username',) username:string){
         return this.moderatorService.searchByUsername(username);
     }
@@ -47,18 +48,19 @@ export class ModeratorController{
     }
 
     @Delete('delete/:id')
+    @UseGuards(AdminSessionGuard)
     deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
         return this.moderatorService.deleteModeratorById(id);
     }
 
     @Patch('block/:id')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     blockModerator(@Param('id', ParseIntPipe) id: number): any{
         return this.moderatorService.blockModeratorById(id);
     }
 
     @Patch('unblock/:id')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     unblockModerator(@Param('id', ParseIntPipe) id: number): any{
         return this.moderatorService.unblockModeratorById(id);
     }
@@ -92,6 +94,7 @@ export class ModeratorController{
     ){
         if(await this.moderatorService.login(username, password) == 1){
             session.username = username;
+            session.role = "moderator";
             return {message:"Successfully logged"};
         }
         else{

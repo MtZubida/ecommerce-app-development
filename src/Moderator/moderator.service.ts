@@ -31,7 +31,7 @@ export class ModeratorService{
     }
 
     async getAllSecureData(): Promise<SecureModeratorDTO[]> {
-        const moderators: ModeratorEntity[] = await this.userRepo.find();
+        const moderators: ModeratorEntity[] = await this.moderatorRepo.find();
         const secureModerators: SecureModeratorDTO[] = moderators.map(
             ({ Username, Firstname, Lastname, DOB, Phone, Email, filename }) => ({
               Username,

@@ -4,7 +4,7 @@ import { diskStorage } from "multer";
 import { AdminService } from "./admin.service";
 import { AdminDTO } from "./DTOs/admin.dto";
 import { EditAdminDTO } from "./DTOs/editAdmin.dto";
-import { SessionGuard } from "./session.guard";
+import { AdminSessionGuard } from "./admin.guard";
 
 @Controller("/admin")
 export class AdminController{
@@ -17,49 +17,50 @@ export class AdminController{
     }
 
     @Get('/getSecure')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     getModeratorSecure(): any {
         return this.adminService.getAllSecureData();
     }
 
     @Get('/getAll')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     getModerators(): any {
         return this.adminService.getAll();
     }
 
     @Get("/search/:id")
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     searchById(@Param('id', ParseIntPipe) id:number){
         return this.adminService.searchById(id);
     }
 
     @Get("search/s/:username")
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     searchByUsername(@Param('username',) username:string){
         return this.adminService.searchByUsername(username);
     }
 
     @Post("/editProfile/:id")
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     @UsePipes(new ValidationPipe())
     editProfile( @Body() editModeratorDTO: EditAdminDTO, @Param('id', ParseIntPipe) id: number): any{
         return this.adminService.editModerator(editModeratorDTO, id); 
     }
 
     @Delete('delete/:id')
+    @UseGuards(AdminSessionGuard)
     deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
         return this.adminService.deleteModeratorById(id);
     }
 
     @Patch('block/:id')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     blockModerator(@Param('id', ParseIntPipe) id: number): any{
         return this.adminService.blockModeratorById(id);
     }
 
     @Patch('unblock/:id')
-    @UseGuards(SessionGuard)
+    @UseGuards(AdminSessionGuard)
     unblockModerator(@Param('id', ParseIntPipe) id: number): any{
         return this.adminService.unblockModeratorById(id);
     }
@@ -93,6 +94,7 @@ export class AdminController{
     ){
         if(await this.adminService.login(username, password) == 1){
             session.username = username;
+            session.role = "admin";
             return {message:"Successfully logged"};
         }
         else{

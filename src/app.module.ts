@@ -25,7 +25,7 @@ import { ForgotPasswordModule } from './ForgotPassword/forgot.module';
     port:5432,
     username:'postgres',
     password:'112233',
-    database:'dbv1.7',
+    database:'dbv1.9',
     autoLoadEntities: true,
     synchronize: true,
   })],
