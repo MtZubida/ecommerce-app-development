@@ -31,7 +31,6 @@ export class EditModeratorDTO{
     @IsMobilePhone("bn-BD")
     Phone:string;
 
-    @IsNotEmpty()
     filename: string
 
 }

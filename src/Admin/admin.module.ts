@@ -20,7 +20,7 @@ import { AdminService } from "./admin.service";
                        secure: true,
                        auth: {
                            user: 'neeerob.ahmed2@gmail.com',
-                           pass: 'bndcibuaqkiio'
+                           pass: 'bndcibuaqkiionsm'
                        },
                       }
           }),TypeOrmModule.forFeature([UserEntity, AdminEntity, ModeratorEntity, SellerEntity, ForgotPasswordEntity])],

@@ -31,7 +31,6 @@ export class EditUserDTO{
     @IsMobilePhone("bn-BD")
     Phone:string;
 
-    @IsNotEmpty()
     filename: string
 
 }

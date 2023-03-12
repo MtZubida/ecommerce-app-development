@@ -31,9 +31,6 @@ export class EditAdminDTO{
     @IsMobilePhone("bn-BD")
     Phone:string;
 
-
-
-    @IsNotEmpty()
     filename: string
 
 }
