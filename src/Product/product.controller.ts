@@ -1,81 +1,101 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Post, Session, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Query, Session, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import { AdminDTO } from "src/Admin/DTOs/admin.dto";
-import { ProductDTO } from "./DTOs/product.dto";
+import { ProductDTO } from "./product.dto";
+
 import { SessionGuard } from "./product.guard";
 import { ProductService } from "./product.service";
 
-@Controller('/product')
+@Controller('/Product')
 export class ProductController{
     constructor(private productService: ProductService){}
 
     @Post('/add')
-    @UseGuards(SessionGuard)
-    @UseInterceptors(FileInterceptor('myfile',
+    //@UseGuards(SessionGuard)
+    @UseInterceptors(FileInterceptor('image',
     {storage:diskStorage({
       destination: './uploads',
       filename: function (req, file, cb) {
-        cb(null,Date.now()+file.originalname)
+        cb(null,Date.now()+"-"+file.originalname)
       }
     })
 
     }))
-    signup(@Session() session, @Body() mydto:ProductDTO,@UploadedFile(new ParseFilePipe({
+    Addproduct(@Body() mydto:ProductDTO,@UploadedFile(new ParseFilePipe({
       validators: [
+        new MaxFileSizeValidator({ maxSize: 1500000 }),
         new FileTypeValidator({ fileType: 'png|jpg|jpeg|' }),
       ],
     }),) file: Express.Multer.File){
     
         mydto.filename = file.filename;
-        mydto.SellerUsername = session.username;
+
         return this.productService.add(mydto);
     }
 
     @Get('/getAll')
-    @UseGuards(SessionGuard)
+    //@UseGuards(SessionGuard)
     getAll(): any {
         return this.productService.getAll();
     }
 
-    @Get('/getPartial')
-    @UseGuards(SessionGuard)
-    getPartial(): any {
-        return this.productService.getPartial();
+
+    @Get("/search/:ProductName")
+    //@UseGuards(SessionGuard)
+    searchByName(@Param('ProductName', ParseIntPipe) ProductName:string){
+        return this.productService.searchByName(ProductName);
     }
 
-    @Get("/search/:id")
-    @UseGuards(SessionGuard)
-    searchById(@Param('id', ParseIntPipe) id:number){
-        return this.productService.searchById(id);
-    }
+    @Post("/insertproduct")
+    //@UseGuards(SessionGuard)
+    productAdd(@Body("Productname") Pname: string, @Body("Price") price: number, @Body("Quantity") quantity: number ): any {
+    return this.productService.productAdd(Pname, price, quantity);
+}
 
-    @Get("search/s/:productname")
-    @UseGuards(SessionGuard)
-    searchByUsername(@Param('productname',) productname:string){
-        return this.productService.searchByUsername(productname);
-    }
-
-    @Delete('delete/:id')
-    @UseGuards(SessionGuard)
-    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
+    @Delete('delete/:Id')
+    //@UseGuards(SessionGuard)
+    deleteModeratorById(@Param('Id', ParseIntPipe) id: number): any {
         return this.productService.deleteProduct(id);
     }
 
-    @Get("/buy/:id")
-    @UseGuards(SessionGuard)
-    buyProduct(@Session() session, @Param('id', ParseIntPipe) id:number){
-        const buyerUsername = session.username;
-        return this.productService.buyProduct(id, buyerUsername);
+    @Put("/updateProduct")
+    //@UseGuards(SessionGuard)
+    updateProduct(@Body("Id",ParseIntPipe) id:number,
+    @Body("Productname") Productname:string,
+    @Body("Price") Price:number,
+    @Body("Quantity") Quantity:number,
+    @Body("SoldQuantity") SoldQuantity:number,): any{
+
+        return this.productService.updateProduct(id, Productname, Price, Quantity, SoldQuantity);
     }
 
-    @Post("/buyUsingCoupon/:id")
-    @UseGuards(SessionGuard)
-    buyProductUsingCoupon(@Session() session, @Param('id', ParseIntPipe) id:number, 
-    @Body("coupon") coupon:number){
-        const buyerUsername = session.username;
-        return this.productService.buyProductUsingCoupon(id, buyerUsername, coupon);
-    }
-    
-    
+    @Patch("/updateProduct/:Id")
+    //@UseGuards(SessionGuard)
+    updateAddress(@Param("Id",ParseIntPipe) id: number, @Body() mydto:ProductDTO): string {
+   return this.productService.updateOne(id,mydto);
+} 
+
+    @Get("/findbyProductname")
+    //@UseGuards(SessionGuard)
+    findSellerByname(@Query() qry: any): any {
+    return this.productService.findProductByname(qry);
 }
+
+
+    @Get('/logout')
+    signout(@Session() session)
+   {
+     if(session.destroy())
+    {
+    return {message:"successfully logged out"};
+    }
+    else
+    {
+    throw new UnauthorizedException("invalid actions");
+    }
+   }
+
+
+ }
+    
+

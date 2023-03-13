@@ -1,5 +1,5 @@
 import { SellerEntity } from "src/Seller/seller.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("product")
 export class ProductEntity{
@@ -11,25 +11,22 @@ export class ProductEntity{
     ProductName:string;
 
     @Column()
-    PublishedDate:Date = new Date();;
-
-    @Column()
     Price:number;
 
     @Column()
-    Discription:string;
+    Description:string;
 
     @Column()
-    SellerUsername:string;
+    Sellername:string;
 
     @Column()
     Quantity:number;
 
     @Column()
-    SelledQuantity:number = 0;
+    SoldQuantity:number;
 
     @Column()
-    filename: string
+    filename: string;
 
     @ManyToOne(() => SellerEntity, (seller) => seller.product)
     seller: SellerEntity
