@@ -1,115 +1,127 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Session, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Delete, Query, UsePipes, ValidationPipe, ParseIntPipe, Patch, Session, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UseInterceptors, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { UserDTO } from "src/User/DTOs/user.dto";
-import { EditSellerDTO } from "./DTOs/editSeller.dto";
-import { SellerDTO } from "./DTOs/seller.dto";
+import {diskStorage} from "multer"
+import { Seller } from "./seller.dto";
 import { SellerService } from "./seller.service";
 import { SessionGuard } from "./session.guard";
 
-@Controller('/seller')
-export class SellerController{
-    constructor(private sellerService: SellerService){}
 
-    @Get('/index')
-    Index(): any {
-        return this.sellerService.getIndex();
-    }
+@Controller("/Seller")
 
-    @Get('/getAll')
-    @UseGuards(SessionGuard)
-    getModerators(): any {
-        return this.sellerService.getAll();
-    }
+export class SellerController {
 
-    @Get("/search/:id")
-    @UseGuards(SessionGuard)
-    searchById(@Param('id', ParseIntPipe) id:number){
-        return this.sellerService.searchById(id);
-    }
+constructor(private sellerService: SellerService){}
 
-    @Get("search/s/:username")
-    @UseGuards(SessionGuard)
-    searchByUsername(@Param('username',) username:string){
-        return this.sellerService.searchByUsername(username);
-    }
+@Get("/dashboard")
+//@UseGuards(SessionGuard)
+ getSeller(@Session() session): string {
 
-    @Post("/editProfile/:id")
-    @UseGuards(SessionGuard)
-    @UsePipes(new ValidationPipe())
-    editProfile( @Body() editModeratorDTO: EditSellerDTO, @Param('id', ParseIntPipe) id: number): any{
-        return this.sellerService.editUser(editModeratorDTO, id); 
-    }
+    return "Seller's Profile: "+"\n\nEmail: "+session.email+"\nSession Id: "+session.id;
+ }
+@Get("/sellerhistory")
+//@UseGuards(SessionGuard)
+Sellerhistory(@Session() session): string {
+    return this.sellerService.Sellerhistory(session);
+}
 
-    @Delete('delete/:id')
-    @UseGuards(SessionGuard)
-    deleteModeratorById(@Param('id', ParseIntPipe) id: number): any {
-        return this.sellerService.deleteModeratorById(id);
-    }
+@Get("/findbyname")
+//@UseGuards(SessionGuard)
+findSellerByname(@Query() qry: any): any {
+    return this.sellerService.findSellerByname(qry);
+}
 
-    @Patch('block/:id')
-    @UseGuards(SessionGuard)
-    blockModerator(@Param('id', ParseIntPipe) id: number): any{
-        return this.sellerService.blockModeratorById(id);
-    }
+@Get("/findall")
+//@UseGuards(SessionGuard)
+findAll(): any {
+   return this.sellerService.findAll();
+}
 
-    @Patch('unblock/:id')
-    @UseGuards(SessionGuard)
-    unblockModerator(@Param('id', ParseIntPipe) id: number): any{
-        return this.sellerService.unblockModeratorById(id);
-    }
+@Post("/registration")
+@UsePipes(new ValidationPipe())
+
+@UseInterceptors(FileInterceptor('image',
+{
+   storage: diskStorage({
+  destination: './uploads',
+  filename: function (req, file, cb) {
+    cb(null,Date.now()+"-"+file.originalname)
+  }
+})
+}))
+
+register(@Body() mydto:Seller, @UploadedFile( new ParseFilePipe({
+    validators: [
+      new MaxFileSizeValidator({ maxSize: 1500000 }),
+      new FileTypeValidator({ fileType: 'png|jpg|jpeg|' }),
+    ],
+  }),) image: Express.Multer.File){
+  
+  mydto.filename = image.filename;  
+  
+  return this.sellerService.register(mydto);
+  
+  }
 
 
-    @Post('/register')
-    @UseInterceptors(FileInterceptor('myfile',
-    {storage:diskStorage({
-      destination: './uploads',
-      filename: function (req, file, cb) {
-        cb(null,Date.now()+file.originalname)
-      }
-    })
-
-    }))
-    signup(@Body() mydto:SellerDTO,@UploadedFile(new ParseFilePipe({
-      validators: [
-        new FileTypeValidator({ fileType: 'png|jpg|jpeg|' }),
-      ],
-    }),) file: Express.Multer.File){
+@Get("/login")
+@UsePipes(new ValidationPipe())
+login(@Session() session, @Body("email") email:string, @Body("password") password:string ): any {
     
-        mydto.filename = file.filename;  
-        mydto.Blocked = false;
-        mydto.Wallet = 0.0;
-        mydto.Star = 0.0;
-        mydto.TotalReviewer = 0;
-        return this.sellerService.signup(mydto);
-    }
+if(this.sellerService.login(email,password))
+{
+  session.email = email;
+  console.log(session.email);
+  return "Login successfull";
+
+}
+else
+{
+  return "Invalid username or password";
+}
+
+}
 
 
-    @Put("/login")
-    async addModerator( @Session() session,
-        @Body("username") username:string,
-        @Body("password") password:string
-    ){
-        if(await this.sellerService.login(username, password) == 1){
-            session.username = username;
-            return {message:"Successfully logged"};
-        }
-        else{
-            return {message:"Invalid username or password"};
-        }
-    }
+@Put("/updateProfile/")
+//@UseGuards(SessionGuard)
+updateProfile(@Body("id",ParseIntPipe) id:number,
+@Body("name") name:string,
+@Body("email") email:string,
+@Body("password") password:string,
+@Body("address") address:string,): any {
+    return this.sellerService.updateProfile(id,name,email,password,address);
+}
 
-    @Get('/logout')
-    signout(@Session() session)
-    {
-        if(session.destroy())
-        {
-            return {message:"you are logged out"};
-        }
-        else
-        {
-            throw new UnauthorizedException("invalid actions");
-        }
-    }
-    
+
+@Patch("/updateAddress/:id")
+//@UseGuards(SessionGuard)
+updateAddress(@Param("id",ParseIntPipe) id: number, @Body() mydto:Seller): string {
+   return this.sellerService.updateOne(id,mydto);
+}
+
+@Delete ("/deleteUser/:id")
+//@UseGuards(SessionGuard)
+deleteUser(@Param("id", ParseIntPipe) Uid:number): any {
+    return this.sellerService.deleteUser(Uid);
+}
+
+@Post("/sendemail")
+//@UseGuards(SessionGuard)
+sendEmail(@Body() mydata){
+return this.sellerService.sendEmail(mydata);
+}
+
+@Get('/logout')
+signout(@Session() session)
+{
+  if(session.destroy())
+  {
+    return {message:"successfully logged out"};
+  }
+  else
+  {
+    throw new UnauthorizedException("invalid actions");
+  }
+}
+
 }
