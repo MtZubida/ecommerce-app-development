@@ -15,7 +15,7 @@ import {MailerModule} from "@nestjs-modules/mailer";
                secure: true,
                auth: {
                    user: "sadmannipun@gmail.com",
-                   pass: "cnfxopcvwjxhmwly"
+                   pass: "password"
                },
               }
   }), TypeOrmModule.forFeature([SellerEntity])],
